@@ -1,6 +1,7 @@
 import numpy as np
 import face_recognition
 import cv2
+from PIL import ImageFont, ImageDraw, Image
 import os
 from datetime import datetime
 import FindCloneAPI
@@ -63,12 +64,19 @@ def face_detect():
 
             if matches[matchIndex]:
                 name = classNames[matchIndex]
-                #print(name)
                 y1, x2, y2, x1 = faceLoc
-                y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
-                cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+                y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 0), 3)
+                cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 0, 0), cv2.FILLED)
+
+                font_path = 'Fonts/Roboto-Regular.ttf'
+                font = ImageFont.truetype(font_path, 32)
+                img_pil = Image.fromarray(img)
+                b, g, r, a = 255, 255, 255, 0
+                draw = ImageDraw.Draw(img_pil)
+                draw.text((x1 + 6, y2 - 35), str(name), font=font, fill=(b, g, r, a))
+                frame = np.array(img_pil)
                 markAttendance(name)
 
             else:
@@ -77,7 +85,7 @@ def face_detect():
                 print("Лицо сохранено")
                 find_clone(filename)
 
-        cv2.imshow("WebCam", img)
+        cv2.imshow("WebCam", frame)
         cv2.waitKey(1)
 
 def find_clone(img):
